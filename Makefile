@@ -1,33 +1,69 @@
-SRCS = ft_strlen.s ft_write.s
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: ajeannot <ajeannot@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2020/02/25 11:41:09 by ajeannot          #+#    #+#              #
+#    Updated: 2020/02/25 16:27:18 by ajeannot         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-NA			=	nasm
-NA_FLAGS	=	-f macho64
+SRCS		=	srcs/ft_strlen.s	\
+				srcs/ft_write.s		\
+				srcs/ft_read.s		\
+				srcs/ft_strcmp.s	\
+				srcs/ft_strcpy.s	\
+				srcs/ft_strdup.s
+
+SRCS_BONUS	=	srcs_bonus/ft_atoi_base_bonus.s			\
+				srcs_bonus/ft_list_push_front_bonus.s	\
+				srcs_bonus/ft_list_size_bonus.s			\
+				srcs_bonus/ft_list_sort_bonus.s			\
+				srcs_bonus/ft_list_remove_if_bonus.s
+
+ASM			=	nasm
+ASM_FLAGS	=	-f macho64
 FLAGS 		=	-Wall -Werror -Wextra
-NAME		=	libasm.a
-TEST		=	test
+COMP		= 	-L . -lasm -o
 
-OBJS = $(SRCS:.s=.o)
+NAME		=	libasm.a
+EXEC		=	LIBASM
+EXEC_BONUS	=	LIBASM_BONUS
+
+OBJS		=	$(SRCS:.s=.o)
+OBJS_BONUS	=	$(SRCS_BONUS:.s=.o)
 
 %.o:			%.s
-				$(NA) $(NA_FLAGS) $<
+				$(ASM) $(ASM_FLAGS) $<
 
 all:			$(NAME)
 
 $(NAME):		$(OBJS)
 				ar rcs $(NAME) $(OBJS)
 
+bonus :			$(NAME) $(OBJS) $(OBJS_BONUS)
+				ar rcs $(NAME) $(OBJS) $(OBJS_BONUS)
+
+test:			all
+				gcc $(FLAGS) $(COMP) $(EXEC) srcs/main.c
+				./$(EXEC)
+
+test_bonus :	bonus
+				gcc $(FLAGS) $(COMP) $(EXEC_BONUS) srcs_bonus/main_bonus.c
+				./$(EXEC_BONUS)
+
 clean:
 				rm -rf $(OBJS)
+				rm -rf $(OBJS_BONUS)
 
-fclean:
-				rm -rf $(OBJS)
+fclean:			clean
 				rm -rf $(NAME)
+				rm -rf $(EXEC)
+				rm -rf $(EXEC_BONUS)
 
 re:				fclean all
 
-comp:			re
-				gcc $(FLAGS) -L . -lasm -o $(TEST) main.c
-				echo " ----- RESULT -----"
-				./$(TEST)
-
-.SILENT :
+.PHONY: 		clean fclean all re
+.SILENT:
